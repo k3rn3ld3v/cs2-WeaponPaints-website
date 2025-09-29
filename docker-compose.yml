@@ -1,0 +1,38 @@
+services:
+  app:
+    image: node:18
+    container_name: cs2-weaponpaints-app
+    restart: unless-stopped
+    working_dir: /usr/src/app
+    volumes:
+      - ./:/usr/src/app
+      - ./config.json:/usr/src/app/config.json:ro
+    command: /bin/sh -c "npm install && npm run dev"
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      NODE_ENV: development
+    ports:
+      - "${APP_PORT:-8080}:27275"
+  db:
+    image: mysql:8.0
+    container_name: cs2-weaponpaints-db
+    restart: unless-stopped
+    environment:
+      MYSQL_DATABASE: ${MYSQL_DATABASE:-weaponpaints}
+      MYSQL_USER: ${MYSQL_USER:-weaponpaints}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD:-weaponpaints}
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:-rootpass}
+    ports:
+      - "${DB_PORT:-3306}:3306"
+    volumes:
+      - db-data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+volumes:
+  db-data:
