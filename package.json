@@ -4,7 +4,10 @@
   "description": "Website for cs2-WeaponPaints plugin",
   "main": ".",
   "scripts": {
+    "updateSkins": "node scripts/update_skins.js",
+    "predev": "npm run updateSkins",
     "dev": "nodemon --ignore ./web/ .",
+    "prebuild": "npm run updateSkins",
     "build": "node builder.js",
     "updateApi": "node updateApi.js"
   },
